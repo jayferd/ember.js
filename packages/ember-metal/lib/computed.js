@@ -83,9 +83,11 @@ function addDependentKeys(desc, obj, keyName) {
 
 /** @private */
 function ComputedProperty(func, opts) {
+  if (!opts) opts = {};
+
   this.func = func;
-  this._cacheable = (opts && opts.cacheable !== undefined) ? opts.cacheable : Ember.CP_DEFAULT_CACHEABLE;
-  this._dependentKeys = opts && opts.dependentKeys;
+  this._cacheable = (opts.cacheable !== undefined) ? opts.cacheable : Ember.CP_DEFAULT_CACHEABLE;
+  this._dependentKeys = opts.dependentKeys;
 }
 
 /**
@@ -181,6 +183,16 @@ Cp.cacheable = function(aFlag) {
 };
 
 /**
+  Call on a computed property to provide a custom setter.
+*/
+Cp.setter = function(setter) { return this.func.set = setter; };
+
+/**
+  Call on a computed property to provide a custom getter.
+*/
+Cp.getter = function(getter) { return this.func.get = getter; };
+
+/**
   Call on a computed property to set it into non-cached mode.  When in this
   mode the computed property will not automatically cache the return value.
 
@@ -274,6 +286,13 @@ Cp.didChange = function(obj, keyName) {
   }
 };
 
+/** @private - calls the custom getter function */
+function callGetter(self, obj, keyName) {
+  var getterFunc = self.func.get || self.func;
+
+  return getterFunc.call(obj, keyName);
+}
+
 /** @private - impl descriptor API */
 Cp.get = function(obj, keyName) {
   var ret, cache;
@@ -281,12 +300,20 @@ Cp.get = function(obj, keyName) {
   if (this._cacheable) {
     cache = meta(obj).cache;
     if (keyName in cache) return cache[keyName];
-    ret = cache[keyName] = this.func.call(obj, keyName);
+    ret = cache[keyName] = callGetter(this, obj, keyName);
   } else {
-    ret = this.func.call(obj, keyName);
+    ret = callGetter(this, obj, keyName);
   }
-  return ret ;
+
+  return ret;
 };
+
+/** @private - calls the custom setter function */
+function callSetter(self, obj, keyName, val) {
+  var setterFunc = self.func.set || self.func;
+
+  return setterFunc.call(obj, keyName, val);
+}
 
 /** @private - impl descriptor API */
 Cp.set = function(obj, keyName, value) {
@@ -306,7 +333,7 @@ Cp.set = function(obj, keyName, value) {
   }
 
   if (cacheable) delete m.cache[keyName];
-  ret = this.func.call(obj, keyName, value);
+  ret = callSetter(this, obj, keyName, value);
   if (cacheable) m.cache[keyName] = ret;
   if (watched) Ember.propertyDidChange(obj, keyName);
   this._suspended = oldSuspended;

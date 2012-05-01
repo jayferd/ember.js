@@ -58,6 +58,31 @@ test('defining computed property should invoke property on set', function() {
   }
 });
 
+testBoth('defining computed properties with custom getters and setters', function(get, set) {
+  var obj = { getCount: 0, setCount: 0 };
+
+  var cp = Ember.computed({
+    get: function(k) { return this.getCount += 1; },
+    set: function(k, v) { return this.setCount += 1; }
+  });
+
+  Ember.defineProperty(obj, 'foo', cp);
+
+  equal(get(obj, 'foo'), 1);
+  equal(obj.getCount, 1);
+
+  equal(set(obj, 'foo', 1), 1);
+  equal(obj.setCount, 1);
+
+  cp.setter(function(k, v) { this.calledSetter = true; });
+  set(obj, 'foo', 'bar');
+  ok(obj.calledSetter);
+
+  cp.getter(function(k) { this.calledGetter = true; });
+  get(obj, 'foo');
+  ok(obj.calledGetter);
+});
+
 var objA, objB;
 module('Ember.computed should inherit through prototype', {
   setup: function() {
