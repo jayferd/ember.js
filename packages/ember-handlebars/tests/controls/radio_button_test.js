@@ -332,7 +332,7 @@ test("selectedValue works even if the view is not in the DOM", function() {
     )
   });
 
-  set(group, 'selectedValue', 'option1');
+  set(group, 'cachedSelectedValue', 'option1');
 
   append(group);
 

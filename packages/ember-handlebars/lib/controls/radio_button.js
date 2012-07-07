@@ -234,6 +234,11 @@ Ember.RadioButtonGroup = Ember.View.extend(
     @field
     @default null
   */
+  cachedSelectedValue: null,
+  didInsertElement: function() {
+    if(this.cachedSelectedValue) set(this,'selectedValue',this.cachedSelectedValue);
+  },
+
   selectedValue: Ember.computed(function(key, value) {
     // getter
     if (arguments.length === 1) {
