@@ -162,10 +162,10 @@ Ember.RadioButton = Ember.View.extend(
       App.question = Ember.Object.create({
         content: "Which of the following is the largest?",
         possibleAnswers: [
-          Ember.Object.create({ label: "A peanut"      value: "peanut"      }),
-          Ember.Object.create({ label: "An elephant"   value: "elephant"    }),
-          Ember.Object.create({ label: "The moon"      value: "moon"        }),
-          Ember.Object.create({ label: "A tennis ball" value: "tennis ball" })
+          Ember.Object.create({ label: "A peanut",      value: "peanut"      }),
+          Ember.Object.create({ label: "An elephant",   value: "elephant"    }),
+          Ember.Object.create({ label: "The moon",      value: "moon"        }),
+          Ember.Object.create({ label: "A tennis ball", value: "tennis ball" })
         ],
         selectedAnswer: null
       });
