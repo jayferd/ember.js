@@ -1,4 +1,4 @@
-var get = Ember.get, getPath = Ember.getPath, set = Ember.set, group, rb, rb2, application;
+var get = Ember.get, getPath = Ember.getPath, set = Ember.set, group, rb, rb2, dispatcher;
 
 var msie = window.jQuery && window.jQuery.browser.msie;
 
@@ -10,16 +10,18 @@ function setAndFlush(obj, key, value) {
 
 module("Ember.RadioButton", {
   setup: function() {
-    application = Ember.Application.create();
+    dispatcher = Ember.EventDispatcher.create();
+    dispatcher.setup();
     group = Ember.RadioButtonGroup.create();
     rb = Ember.RadioButton.create();
   },
-
   teardown: function() {
-    rb.destroy();
-    if(rb2) rb2.destroy();
-    if(group) group.destroy();
-    application.destroy();
+    Ember.run(function() {
+      dispatcher.destroy();
+      rb.destroy();
+      if(rb2) rb2.destroy();
+      if(group) group.destroy();
+    });
   }
 });
 
@@ -30,20 +32,20 @@ function append(v) {
 }
 
 test("should have the class 'ember-radio-button'", function() {
-  rb.createElement();
+  append(rb);
 
   ok(rb.$().hasClass("ember-radio-button"));
 });
 
 test("#isDisabled by default returns false", function() {
   strictEqual(get(rb, "isDisabled"), false);
-  rb.createElement();
+  append(rb);
 
   ok(rb.$().is(":not(:disabled)"));
 });
 
 test("#isDisabled= propogates changes to the disabled property on the element once inserted", function() {
-  rb.createElement();
+  append(rb);
 
   setAndFlush(rb, "isDisabled", true);
   ok(rb.$().is(":disabled"), "the element became disabled when set to 'true'");
@@ -136,17 +138,19 @@ test("#group= when the button is selected and an Ember.RadioButtonGroup is passe
 
 module("Ember.RadioButtonGroup", {
   setup: function() {
-    application = Ember.Application.create();
+    dispatcher = Ember.EventDispatcher.create();
+    dispatcher.setup();
     group = Ember.RadioButtonGroup.create();
     rb = Ember.RadioButton.create();
     rb2 = Ember.RadioButton.create();
   },
-
   teardown: function() {
-    rb.destroy();
-    rb2.destroy();
-    group.destroy();
-    application.destroy();
+    Ember.run(function() {
+      dispatcher.destroy();
+      rb.destroy();
+      if(rb2) rb2.destroy();
+      if(group) group.destroy();
+    });
   }
 });
 
