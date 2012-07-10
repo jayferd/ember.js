@@ -190,11 +190,15 @@ Ember.RadioButton = Ember.View.extend(
         {{#view Ember.RadioButtonGroup name="answer" selectedValueBinding="App.question.selectedAnswer"}}
         {{#each question.possibleAnswers}}
           <label>
-            {{view RadioButton valueBinding="value"}}
+            {{view view.RadioButton valueBinding="value"}}
             {{label}}
           </label>
         {{/each}}
       </script>
+
+  Note: "{{view view.RadioButton...}}" is used because the {{#each}} 
+  block changes context, and thus "{{view RadioButton}}" in would 
+  fail in this case fails.
 
   @extends Ember.View
 */
