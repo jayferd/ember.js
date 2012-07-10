@@ -168,6 +168,7 @@ test("#numRadioButtons returns the number of radio buttons that belong to the gr
 });
 
 test("#selectedValue when there is no selection returns null", function() {
+  append(group);
   strictEqual(get(group, "selection"), null, "precond - the group has no selection");
   strictEqual(get(group, "selectedValue"), null, "selectedValue is null");
 });
@@ -175,6 +176,7 @@ test("#selectedValue when there is no selection returns null", function() {
 test("#selectedValue when there is a selection returns its value", function() {
   var someValue = { foo: "bar" },
       selectedButton = Ember.RadioButton.create({ isSelected: true, group: group, value: someValue });
+  append(group);
 
   strictEqual(get(group, "selection"), selectedButton, "precond - the group has a selection");
   strictEqual(get(group, "selectedValue"), someValue, "selectedValue returned the value of the selected button");
@@ -185,6 +187,7 @@ test("#selectedValue changes when the selection changes", function() {
       newValue      = { foo: "bar" },
       originalSelection = Ember.RadioButton.create({ isSelected: true,  group: group, value: originalValue }),
       deselectedButton  = Ember.RadioButton.create({ isSelected: false, group: group, value: newValue });
+  append(group);
 
   strictEqual(get(group, "selection"), originalSelection, "precond - the group has a selection");
   strictEqual(get(group, "selectedValue"), originalValue, "precond - selectedValue returned the value of the selected button");
@@ -200,6 +203,7 @@ test("#selectedValue= passed a non-null value changes the selection to the radio
       newValue      = { foo: "bar" },
       originalSelection = Ember.RadioButton.create({ isSelected: true,  group: group, value: originalValue }),
       deselectedButton  = Ember.RadioButton.create({ isSelected: false, group: group, value: newValue });
+  append(group);
 
   strictEqual(get(group, "selection"), originalSelection, "precond - the group has a selection");
   strictEqual(get(group, "selectedValue"), originalValue, "precond - selectedValue returned the value of the selected button");
@@ -211,12 +215,14 @@ test("#selectedValue= passed a non-null value changes the selection to the radio
 });
 
 test("#selection when the group has no radio buttons returns null", function() {
+  append(group);
   equal(get(group, "numRadioButtons"), 0, "precond - the group has no radio buttons");
   strictEqual(get(group, "selection"), null, "#selection returns null");
 });
 
 test("#selection when the group has radio buttons but none are selected returns null", function() {
   group._addRadioButton(rb);
+  append(group);
   equal(get(group, "numRadioButtons"), 1, "precond - the group has radio buttons");
   strictEqual(get(rb, "isSelected"), false, "precond - no radio buttons are selected");
   strictEqual(get(group, "selection"), null, "#selection returns null");
@@ -224,6 +230,7 @@ test("#selection when the group has radio buttons but none are selected returns 
 
 test("#selection when the group has radio buttons and one is selected returns the selected radio button", function() {
   var selectedButton = Ember.RadioButton.create({ isSelected: true, group: group });
+  append(group);
   equal(get(group, "numRadioButtons"), 1, "precond - the group has radio buttons");
   strictEqual(get(selectedButton, "isSelected"), true, "precond - a radio button is selected");
   strictEqual(get(group, "selection"), selectedButton, "#selection returns the selected radio button");
@@ -231,6 +238,7 @@ test("#selection when the group has radio buttons and one is selected returns th
 
 test("#selection becomes null when the selected radio button is removed from the group", function() {
   var originalSelection = Ember.RadioButton.create({ isSelected: true,  group: group });
+  append(group);
 
   strictEqual(get(group, "selection"), originalSelection, "precond - the group has a selection");
 
@@ -242,6 +250,7 @@ test("#selection becomes null when the selected radio button is removed from the
 
 test("#selection will automatically change to radio buttons that are selected when joining the group", function() {
   var originalSelection = Ember.RadioButton.create({ isSelected: true,  group: group }), newAddition;
+  append(group);
 
   strictEqual(get(group, "selection"), originalSelection, "precond - the group has a selection");
 
@@ -254,17 +263,20 @@ test("#selection will automatically change to radio buttons that are selected wh
 test("#selection= passed anything other than null or an instance of Ember.RadioButton raises an error", function() {
   raises(function() {
     set(group, "selection", "foo");
+    append(group);
   });
 });
 
 test("#selection= passed an Ember.RadioButton that isn't part of the group raises an error", function() {
   raises(function() {
     set(group, "selection", rb);
+    append(group);
   });
 });
 
 test("#selection= sets the 'isSelected' property to true on the new selection", function() {
   var deselectedButton = Ember.RadioButton.create({ isSelected: false, group: group});
+  append(group);
 
   setAndFlush(group, "selection", deselectedButton);
   strictEqual(get(group, "selection"), deselectedButton, "the change was successful");
@@ -274,6 +286,7 @@ test("#selection= sets the 'isSelected' property to true on the new selection", 
 test("#selection= sets the 'isSelected' property to false on the old selection", function() {
   var originalSelection = Ember.RadioButton.create({ isSelected: true,  group: group }),
       deselectedButton  = Ember.RadioButton.create({ isSelected: false, group: group });
+  append(group);
 
   setAndFlush(group, "selection", deselectedButton);
 
@@ -283,6 +296,7 @@ test("#selection= sets the 'isSelected' property to false on the old selection",
 
 test("#selection= when a selection exists and null was passed deselects the previous selection", function() {
   var originalSelection = Ember.RadioButton.create({ isSelected: true,  group: group });
+  append(group);
 
   setAndFlush(group, "selection", null);
 
@@ -293,6 +307,7 @@ test("#selection= when a selection exists and null was passed deselects the prev
 test("watches for changes to 'isSelected' on the radio buttons and updates the selection accordingly", function() {
   var originalSelection = Ember.RadioButton.create({ isSelected: true,  group: group }),
       deselectedButton  = Ember.RadioButton.create({ isSelected: false, group: group });
+  append(group);
 
   setAndFlush(deselectedButton, "isSelected", true);
 
@@ -312,7 +327,6 @@ test("RadioButtonGroup as a view", function() {
       '{{ view RadioButton value="option2" }}'
     )
   });
-
   append(group);
 
   var option1 = group.buttonForValue('option1');
@@ -336,7 +350,7 @@ test("selectedValue works even if the view is not in the DOM", function() {
     )
   });
 
-  set(group, 'cachedSelectedValue', 'option1');
+  set(group, 'selectedValue', 'option1');
 
   append(group);
 

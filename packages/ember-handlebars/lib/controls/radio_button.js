@@ -234,11 +234,6 @@ Ember.RadioButtonGroup = Ember.View.extend(
     @field
     @default null
   */
-  cachedSelectedValue: null,
-  didInsertElement: function() {
-    if(this.cachedSelectedValue) set(this,'selectedValue',this.cachedSelectedValue);
-  },
-
   selectedValue: Ember.computed(function(key, value) {
     // getter
     if (arguments.length === 1) {
@@ -248,12 +243,16 @@ Ember.RadioButtonGroup = Ember.View.extend(
     // setter
     } else {
       if (!Ember.none(value)) {
-        var buttonForValue = this.buttonForValue(value);
-
-        ember_assert(fmt("%@ - selectedValue can only be set to the value of a radio button in the group. You passed %@", [this, value]), !!buttonForValue);
-
-        set(this, "selection", buttonForValue);
-
+        if(this._insertFired) {
+          // Radio Buttons exist in DOM and can be set
+          var buttonForValue = this.buttonForValue(value);
+          ember_assert(fmt("%@ - selectedValue can only be set to the value of a radio button in the group. You passed %@", [this, value]), !!buttonForValue);
+          set(this, "selection", buttonForValue);
+        }
+        else {
+          // Radio Buttons do not exist in DOM, cache for didInsertElement
+          this._cachedSelectedValue = value;
+        }
         return value;
       }
     }
@@ -264,6 +263,18 @@ Ember.RadioButtonGroup = Ember.View.extend(
   },
 
   _selection: null,
+
+  /** @private */
+  _cachedSelectedValue: null,
+
+  /** @private */
+  _insertFired: false,
+
+  /** @private */
+  didInsertElement: function() {
+    this._insertFired = true;
+    if(this._cachedSelectedValue) set(this,'selectedValue',this._cachedSelectedValue);
+  },
 
   /**
     Contains a reference to the currently selected RadioButton control in the group.
